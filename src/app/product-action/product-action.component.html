@@ -1,0 +1,134 @@
+<div class="container my-4">
+    <h2>
+        {{
+        crudMode === CrudModeEnum.Add
+        ? 'Shto Produkt'
+        : crudMode === CrudModeEnum.Edit
+        ? 'Modifiko Produkt'
+        : 'Shiko Produkt'
+        }}
+    </h2>
+
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+        <!-- Name -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Emri</label>
+            <input id="name" type="text" class="form-control" formControlName="name" placeholder="Vendos emrin"
+                [readonly]="crudMode === CrudModeEnum.View" />
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Përshkrimi</label>
+            <textarea id="description" class="form-control" formControlName="description"
+                placeholder="Vendos përshkrimin" rows="4" [readonly]="crudMode === CrudModeEnum.View"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+            <label for="price" class="form-label">Çmimi</label>
+            <input id="price" type="number" class="form-control" formControlName="price" placeholder="Vendos çmimin"
+                [readonly]="crudMode === CrudModeEnum.View" />
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+            <div class="mb-3">
+                <label class="form-label">Kategoria</label>
+                <select class="form-select" formControlName="category_id">
+                    <option [ngValue]="null" disabled selected>Zgjidhni kategorine</option>
+                    <option *ngFor="let category of categories()" [ngValue]="category.id">{{ category.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <button *ngIf="CrudModeEnum.View !== crudMode" type="submit" class="btn btn-primary me-2"
+            [disabled]="myForm.invalid">
+            Posto
+        </button>
+
+        <!-- Back -->
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="goBack()">
+            &#8592; Kthehu
+        </button>
+
+        <!-- Shto Gjendje -->
+        <button *ngIf="crudMode === CrudModeEnum.Edit" type="button" class="btn btn-outline-secondary"
+            (click)="addStock()">
+            Shto Gjendje
+        </button>
+
+        <!-- Accordion -->
+        <div *ngIf="crudMode === CrudModeEnum.Edit" class="course-content my-4">
+            <mat-accordion multi formArrayName="stocks">
+                <mat-expansion-panel (opened)="stockIndex = i" (closed)="stockIndex = undefined"
+                    *ngFor="let stockGroup of stocks.controls; let i = index" [formGroupName]="i" class="section-panel">
+
+                    <mat-expansion-panel-header>
+                        <mat-panel-title class="d-flex align-items-center justify-content-between">
+                            <span class="section-title">{{myForm.controls['name'].value + ' gjendje ' +
+                                stockGroup.get('quantity')?.value + ' - ' +
+                                (stockGroup.get('date')?.value.date | date: 'mediumDate') }}</span>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary border-0 btn-sm ms-2"
+                                    (click)="editSection(stockGroup); $event.stopPropagation();"
+                                    aria-label="Edit section">
+                                    <mat-icon class="done-icon">edit</mat-icon>
+                                </button>
+
+                                <button type="button" class="btn btn-outline-secondary border-0 btn-sm ms-2"
+                                    (click)="deleteSection(stockGroup.getRawValue(),i); $event.stopPropagation();"
+                                    aria-label="Edit section">
+                                    <mat-icon class="done-icon">delete</mat-icon>
+                                </button>
+                            </div>
+
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <!-- Nested sales array -->
+                    <div formArrayName="sales">
+                        <mat-nav-list *ngIf="getSales(i) && getSales(i).length > 0; else noSales">
+                            <mat-list-item *ngFor="let sale of getSales(i).controls; let j = index" [formGroupName]="j"
+                                class="lesson-item">
+                                <div class="d-flex align-items-center justify-content-start">
+
+                                    <span class="lesson-title">{{ myForm.controls['name'].value + ' shitje ' +
+                                        sale.get('quantity')?.value + ' - ' +
+                                        (sale.get('date')?.value.date | date: 'mediumDate') }}</span>
+                                    <div>
+                                        <button type="button" class="btn btn-outline-secondary border-0 btn-sm ms-2"
+                                            (click)="editSale(i, j); $event.stopPropagation();" aria-label="Edit sale">
+                                            <mat-icon class="done-icon">edit</mat-icon>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary border-0 btn-sm ms-2"
+                                            (click)="deleteSale(sale.getRawValue(),i,j); $event.stopPropagation();"
+                                            aria-label="Edit section">
+                                            <mat-icon class="done-icon">delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </mat-list-item>
+                        </mat-nav-list>
+                        <button type="button" class="btn btn-outline-secondary" (click)="addSale()">
+                            Shto Shitje
+                        </button>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+
+            <ng-template #noSales>
+                <mat-nav-list>
+                    <mat-list-item disabled>
+                        <span class="lesson-title text-muted">Asnjë shitje e shtuar.</span>
+                    </mat-list-item>
+                </mat-nav-list>
+            </ng-template>
+
+        </div>
+    </form>
+</div>
+
+<app-stock-modal #stockModal (formSubmitted)="handleStockModalSubmitted($event)"></app-stock-modal>
+<app-sale-modal #saleModal (formSubmitted)="handleSaleModalSubmitted($event)"></app-sale-modal>

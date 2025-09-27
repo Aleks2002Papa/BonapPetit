@@ -1,0 +1,40 @@
+<div class="top-bar">
+  <button class="btn add" (click)="addCategory()">
+    <i class="fas fa-plus"></i> Shto kategori
+  </button>
+</div>
+<div class="search-box">
+  <input type="text" placeholder="Kërko..." [value]="searchText()"
+    (input)="searchText.set($any($event.target).value)" />
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th (click)="sortBy('id')">ID</th>
+      <th (click)="sortBy('name')">Emri</th>
+      <th (click)="sortBy('description')">Pershkrimi</th>
+      <th>Produkti</th>
+      <th>Veprimet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let category of filteredCategories()">
+      <td>{{ category.id }}</td>
+      <td>{{ category.name }}</td>
+      <td>{{ category.description | slice:0:50 }}{{ category.description.length > 50 ? '...' : '' }}</td>
+      <td>{{ category.product }}</td>
+      <td class="actions">
+        <button class="btn view" matTooltip="Shiko kategorine" (click)="viewCategory(category)">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn edit" matTooltip="Modifiko kategorine" (click)="editCategory(category)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn delete" matTooltip="Fshi kategorine" (click)="deleteCategory(category)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

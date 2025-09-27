@@ -1,0 +1,47 @@
+<div #myModal class="modal fade" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form [formGroup]="myForm" (ngSubmit)="submitForm()">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockModalLabel">{{myForm.controls['id'].value ? 'Modifiko Shitje' :
+                        'Shto Shitje'}}</h5>
+                    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+                </div>
+                <div class="modal-body">
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>Data</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="date" />
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Sasia</label>
+                        <input id="price" type="number" class="form-control" formControlName="quantity" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Cmimi</label>
+                        <input id="price" type="number" class="form-control" formControlName="price" />
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label class="form-label">Statusi</label>
+                            <select class="form-select" formControlName="status">
+                                <option [ngValue]="null" disabled selected>Zgjidhni Statusin</option>
+                                <option value="e sotme" [ngValue]="'e sotme'">{{ 'e sotme' }}</option>
+                                <option value="e mbetur" [ngValue]="'e mbetur'">{{ 'e mbetur' }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="close()">
+                        Mbyll
+                    </button>
+                    <button [disabled]="myForm.invalid" type="submit" class="btn btn-primary">
+                        Ruaj
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

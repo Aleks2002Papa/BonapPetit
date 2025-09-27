@@ -1,0 +1,44 @@
+<div class="top-bar">
+  <button class="btn add" (click)="addUser()">
+    <i class="fas fa-plus"></i> Shto përdorues
+  </button>
+</div>
+<div class="search-box">
+  <input
+    type="text"
+    placeholder="Kërko..."
+    [value]="searchText()"
+    (input)="searchText.set($any($event.target).value)"
+  />
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th (click)="sortBy('id')">ID</th>
+      <th (click)="sortBy('name')">Name</th>
+      <th (click)="sortBy('email')">Email</th>
+      <th (click)="sortBy('role')">Role</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of filteredUsers()">
+      <td>{{ user.id }}</td>
+      <td>{{ user.name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td class="actions">
+        <button class="btn view" (click)="viewUser(user)">
+          <i class="fas fa-eye"></i> 
+        </button>
+        <button class="btn edit" (click)="editUser(user)">
+          <i class="fas fa-edit"></i> 
+        </button>
+        <button class="btn delete" (click)="deleteUser(user)">
+          <i class="fas fa-trash"></i> 
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

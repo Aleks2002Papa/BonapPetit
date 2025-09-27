@@ -1,0 +1,11 @@
+<h1 class="main-title">Faqa Kryesore</h1>
+
+<div class="card-container">
+    @for (item of items; track item.id) {
+        <div class="card" (click)="navigateTo(item)" >
+            <div class="card-content">
+                <h2 class="card-title">{{item.name}}</h2>
+            </div>
+        </div>
+    }
+</div>

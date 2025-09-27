@@ -1,0 +1,41 @@
+<div #myModal class="modal fade" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form [formGroup]="myForm" (ngSubmit)="submitForm()">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockModalLabel">{{myForm.controls['id'].value ? 'Modifiko Gjendje' : 'Shto Gjendje'}}</h5>
+                    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+                </div>
+                <div class="modal-body">
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>Data</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="date" />
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Sasia</label>
+                        <input id="price" type="number" class="form-control" formControlName="quantity" />
+                    </div>
+                    <!-- <div class="mb-3">
+                        <div class="mb-3">
+                            <label class="form-label">Shitjet</label>
+                            <select class="form-select" formControlName="sales">
+                                <option [ngValue]="null" disabled selected>Zgjidhni shitjen</option>
+                                <option *ngFor="let sale of salesList()" [ngValue]="sale.id">{{ sale.id }}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" [disabled]="myForm.invalid" class="btn btn-secondary" (click)="close()">
+                        Mbyll
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Ruaj
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

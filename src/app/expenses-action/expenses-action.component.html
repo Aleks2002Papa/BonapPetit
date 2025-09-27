@@ -1,0 +1,39 @@
+<div class="form-container">
+    <h2> {{ crudMode === CrudModeEnum.Add ? 'Shto Shpenzim' : crudMode === CrudModeEnum.Edit ? 'Modifiko Shpenzim' :
+        'Shiko
+        Shpenzim'}}</h2>
+
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Emri</mat-label>
+            <input matInput type="text" formControlName="name" placeholder="Vendos emrin" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Përshkrimi</mat-label>
+            <textarea matInput formControlName="description" placeholder="Vendos përshkrimin" rows="4"
+                cdkTextareaAutosize></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Shuma</mat-label>
+            <input matInput type="number" formControlName="amount" placeholder="Vendos shumen" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Data</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <button [disabled]="myForm.invalid" *ngIf="crudMode !== CrudModeEnum.View" mat-raised-button color="primary" type="submit">
+            Posto
+        </button>
+
+        <button mat-stroked-button color="accent" type="button" (click)="goBack()">
+            &#8592; Kthehu
+        </button>
+    </form>
+</div>

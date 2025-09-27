@@ -1,0 +1,24 @@
+<div class="form-container">
+  <h2>Shto kategori</h2>
+
+  <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Emri</mat-label>
+      <input matInput formControlName="name" placeholder="Vendos emrin" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Përshkrimi</mat-label>
+      <textarea matInput formControlName="description" placeholder="Vendos përshkrimin" rows="4"
+        cdkTextareaAutosize></textarea>
+    </mat-form-field>
+
+    <button [disabled]="myForm.invalid" mat-raised-button color="primary" type="submit">
+      Posto
+    </button>
+
+    <button mat-stroked-button color="accent" type="button" (click)="goBack()">
+      &#8592; Kthehu
+    </button>
+  </form>
+</div>
