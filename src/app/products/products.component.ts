@@ -1,9 +1,10 @@
 import { Component, computed, signal } from '@angular/core';
 import { ApiCallsService } from '../services/api-calls.service';
 import { Router } from '@angular/router';
-import { finalize, take, tap } from 'rxjs';
+import { catchError, EMPTY, filter, finalize, switchMap, take, tap } from 'rxjs';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { ConfirmationModalService } from '../services/confirmation-modal.service';
 
 @Component({
   selector: 'app-products',
@@ -65,7 +66,14 @@ export class ProductsComponent {
   });
 
 
-  constructor(private apiCallService: ApiCallsService, private router: Router, private spinner: NgxSpinnerService,private toastr:ToastrService) { }
+  constructor(
+    private apiCallService: ApiCallsService,
+    private router: Router,
+    private spinner: NgxSpinnerService,
+    private toastr: ToastrService,
+    private confirmationModal: ConfirmationModalService
+  ) { };
+
 
   ngOnInit(): void {
     this.getProduct()?.subscribe();
@@ -102,19 +110,39 @@ export class ProductsComponent {
 
   deleteProduct(sale: any) {
     this.spinner.show();
-    this.apiCallService.deleteProduct(sale)
+
+    return this.apiCallService.deleteProduct(sale).pipe(
+      tap(() => this.toastr.success('Produkti u fshi me sukses!')),
+      switchMap(() => this.getProduct() ?? EMPTY),
+      catchError((error) => {
+        this.toastr.error('Ndodhi një gabim gjatë fshirjes së produktit!');
+        return EMPTY;
+      }),
+      finalize(() => this.spinner.hide())
+    )
+  }
+
+  confirmDeleteProduct(product: any) {
+    const dialog = this.confirmationModal.open({
+      backdrop: {
+        hasBackdrop: true,
+        clickOutsideToClose: true,
+      },
+      data: {
+        header: 'Konfirmo Fshirjen!',
+        message: 'Jeni të sigurt që dëshironi të fshini këtë produkt?',
+        confirmLabel: 'Fshi Produktin',
+        cancelLabel: 'Anulo',
+        confirmColor: 'danger',
+        icon: 'danger',
+      },
+    });
+    dialog.afterClosed$
       .pipe(
-        finalize(() => this.spinner.hide())
+        filter(res => res.data === true),
+        switchMap(() => this.deleteProduct(product)),
       )
-      .subscribe({
-        next: (res) => {
-          this.toastr.success('Produkti u fshi me sukses!');
-          this.getProduct()?.subscribe();
-        },
-        error: (err) => {
-          this.toastr.error('Ndodhi një gabim gjatë fshirjes së produktit!');
-        }
-      });
+      .subscribe();
   }
 
 

@@ -38,6 +38,8 @@ import { ToastrModule } from 'ngx-toastr'
 
 // ✅ Import Albanian locale
 import localeSq from '@angular/common/locales/sq';
+import { ConfirationModalComponent } from './shared/confiration-modal/confiration-modal.component';
+import { ConfirmationModalService } from './services/confirmation-modal.service';
 registerLocaleData(localeSq);
 
 export const EUROPEAN_DATE_FORMATS: MatDateFormats = {
@@ -70,6 +72,7 @@ export const EUROPEAN_DATE_FORMATS: MatDateFormats = {
     StockModalComponent,
     SaleModalComponent,
     ExpensesActionComponent,
+    ConfirationModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -98,6 +101,7 @@ export const EUROPEAN_DATE_FORMATS: MatDateFormats = {
     }),
   ],
   providers: [
+    ConfirmationModalService,
     provideClientHydration(withEventReplay()),
     { provide: LOCALE_ID, useValue: 'sq' },          // ✅ Global locale
     { provide: MAT_DATE_LOCALE, useValue: 'sq-AL' }, // ✅ Material datepicker locale

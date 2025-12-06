@@ -62,7 +62,7 @@
         <!-- Accordion -->
         <div *ngIf="crudMode === CrudModeEnum.Edit" class="course-content my-4">
             <mat-accordion multi formArrayName="stocks">
-                <mat-expansion-panel (opened)="stockIndex = i" (closed)="stockIndex = undefined"
+                <mat-expansion-panel (opened)="stockIndex = i" [expanded]="true" (closed)="stockIndex = undefined"
                     *ngFor="let stockGroup of stocks.controls; let i = index" [formGroupName]="i" class="section-panel">
 
                     <mat-expansion-panel-header>

@@ -1,9 +1,10 @@
 import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { ApiCallsService } from '../services/api-calls.service';
-import { catchError, filter, finalize, of, take, tap } from 'rxjs';
+import { catchError, EMPTY, filter, finalize, of, switchMap, take, tap } from 'rxjs';
 import { Route, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { ConfirmationModalService } from '../services/confirmation-modal.service';
 
 
 @Component({
@@ -47,7 +48,13 @@ export class CategoryComponent implements OnInit {
   });
 
 
-  constructor(private apiCallService: ApiCallsService, private router: Router, private spinner: NgxSpinnerService, private toastr: ToastrService) { }
+  constructor(
+    private apiCallService: ApiCallsService,
+    private router: Router,
+    private spinner: NgxSpinnerService,
+    private toastr: ToastrService,
+    private confirmationModal: ConfirmationModalService,
+  ) { }
 
   ngOnInit(): void {
     this.getCategories()?.subscribe();
@@ -92,23 +99,42 @@ export class CategoryComponent implements OnInit {
     this.router.navigate([`category/edit/${category.id}`]);
   }
 
+  confirmDeleteCategory(category: any) {
+    const dialog = this.confirmationModal.open({
+      backdrop: {
+        hasBackdrop: true,
+        clickOutsideToClose: true,
+      },
+      data: {
+        header: 'Konfirmo Fshirjen!',
+        message: 'Jeni të sigurt që dëshironi të fshini këtë kategori?',
+        confirmLabel: 'Fshi Kategorinë',
+        cancelLabel: 'Anulo',
+        confirmColor: 'danger',
+        icon: 'danger',
+      },
+    });
+    dialog.afterClosed$
+      .pipe(
+        filter(res => res.data === true),
+        switchMap(() => this.deleteCategory(category)),
+      )
+      .subscribe();
+  }
+
   deleteCategory(category: any) {
     this.spinner.show();
 
-    this.apiCallService.deleteCategory(category.id)
-      .pipe(
-        finalize(() => this.spinner.hide())   // always hide spinner
-      )
-      .subscribe({
-        next: () => {
-          this.toastr.success('Kategoria u fshi me sukses!');
-          this.getCategories()?.subscribe();
-        },
-        error: (err) => {
-          console.error('deleteCategory error:', err);
-          this.toastr.error('Ndodhi një gabim gjatë fshirjes së kategorisë!');
-        }
-      });
+    return this.apiCallService.deleteCategory(category.id).pipe(
+      tap(() => this.toastr.success('Kategoria u fshi me sukses!')),
+      switchMap(() => this.getCategories() ?? EMPTY),
+      catchError((error) => {
+        console.error('deleteCategory error:', error);
+        this.toastr.error('Ndodhi një gabim gjatë fshirjes së kategorisë!');
+        return EMPTY;
+      }),
+      finalize(() => this.spinner.hide())
+    )
   }
 
   addCategory() {

@@ -19,7 +19,8 @@ export class DashboardComponent {
     // { id: 3, name: 'Shitje' },
     // { id: 4, name: 'Gjendje' },
     { id: 5, name: 'Shpenzime' },
-    { id: 6, name: 'Raporte' }]
+    // { id: 6, name: 'Raporte' }
+  ]
 
 
   constructor(private router: Router) { }

@@ -1,9 +1,10 @@
 import { Component, computed, signal } from '@angular/core';
 import { ApiCallsService } from '../services/api-calls.service';
 import { Router } from '@angular/router';
-import { catchError, finalize, of, take, tap } from 'rxjs';
+import { catchError, EMPTY, filter, finalize, of, switchMap, take, tap } from 'rxjs';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { ConfirmationModalService } from '../services/confirmation-modal.service';
 
 @Component({
   selector: 'app-expenses',
@@ -45,7 +46,13 @@ export class ExpensesComponent {
   });
 
 
-  constructor(private apiCallService: ApiCallsService, private router: Router, private spinner: NgxSpinnerService, private toastr: ToastrService) { }
+  constructor(
+    private apiCallService: ApiCallsService,
+    private router: Router,
+    private spinner: NgxSpinnerService,
+    private toastr: ToastrService,
+    private confirmationModal: ConfirmationModalService
+  ) { }
 
   ngOnInit(): void {
     this.getExpenses()?.subscribe();
@@ -88,22 +95,41 @@ export class ExpensesComponent {
     this.router.navigate([`expenses/edit/${expanse.id}`]);
   }
 
-  deleteExpense(expanse: any) {
+  deleteExpense(expense: any) {
     this.spinner.show();
-    this.apiCallService.deleteExpanse(expanse.id)
-      .pipe(
-        finalize(() => this.spinner.hide())
-      )
-      .subscribe({
-        next: (res) => {
-          this.toastr.success('Shpenzimi u fshi me sukses');
-          this.getExpenses()?.subscribe();
-        },
-        error: (err) => {
-          this.toastr.error('Ndodhi një gabim gjatë fshirjes së shpenzimit!');
-        }
-      });
 
+    return this.apiCallService.deleteExpanse(expense.id).pipe(
+      tap(() => this.toastr.success('Shpenzimi u fshi me sukses')),
+      switchMap(() => this.getExpenses() ?? EMPTY),
+      catchError((error) => {
+        this.toastr.error('Ndodhi një gabim gjatë fshirjes së shpenzimit!');
+        return EMPTY;
+      }),
+      finalize(() => this.spinner.hide())
+    )
+  }
+
+  confirmDeleteExpense(expense: any) {
+    const dialog = this.confirmationModal.open({
+      backdrop: {
+        hasBackdrop: true,
+        clickOutsideToClose: true,
+      },
+      data: {
+        header: 'Konfirmo Fshirjen!',
+        message: 'Jeni të sigurt që dëshironi të fshini këtë shpenzim?',
+        confirmLabel: 'Fshi Shpenzimin',
+        cancelLabel: 'Anulo',
+        confirmColor: 'danger',
+        icon: 'danger',
+      },
+    });
+    dialog.afterClosed$
+      .pipe(
+        filter(res => res.data === true),
+        switchMap(() => this.deleteExpense(expense)),
+      )
+      .subscribe();
   }
 
   addExpense() {
